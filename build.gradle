@@ -1,0 +1,37 @@
+plugins {
+    id 'application'
+}
+
+version = '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        JavaLanguageVersion.of(25)
+    }
+}
+
+application {
+    mainClass = 'com.silvanschermer.Main'
+}
+
+jar {
+    manifest {
+        attributes(
+                'main-class': 'com.silvanschermer.Main'
+        )
+    }
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
