@@ -1,4 +1,4 @@
-package com.silvanschermer;
+package com.silvanschermer.http;
 
 import com.silvanschermer.utils.Logger;
 

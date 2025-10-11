@@ -1,6 +1,6 @@
 package com.silvanschermer;
 
-import com.silvanschermer.utils.Logger;
+import com.silvanschermer.http.HttpServer;
 
 public class Main {
     public static void main(String[] args) {
