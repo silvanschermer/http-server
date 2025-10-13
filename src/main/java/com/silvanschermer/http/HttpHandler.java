@@ -1,6 +1,7 @@
 package com.silvanschermer.http;
 
 import com.silvanschermer.utils.Logger;
+import java.io.IOException;
 import java.net.Socket;
 
 public class HttpHandler implements Runnable {
@@ -13,6 +14,13 @@ public class HttpHandler implements Runnable {
 
   @Override
   public void run() {
-    Logger.info("Running HTTP Handler");
+    try {
+      HttpRequest request = new HttpReader().fromSocket(socket);
+
+      Logger.info(request.getRawHeaders());
+      socket.close();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

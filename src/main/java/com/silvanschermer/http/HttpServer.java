@@ -18,12 +18,12 @@ public class HttpServer {
   }
 
   public void start() {
-    // auto close resource...
     try (ServerSocket serverSocket = new ServerSocket(port)) {
       Logger.info("HTTP Server started on port " + port);
 
       while (true) {
         Socket clientSocket = serverSocket.accept();
+        System.out.println("Client connected");
         executor.submit(new HttpHandler(clientSocket));
       }
     } catch (IOException e) {
