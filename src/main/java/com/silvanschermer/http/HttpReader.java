@@ -1,6 +1,5 @@
 package com.silvanschermer.http;
 
-import com.silvanschermer.utils.Logger;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,9 +14,9 @@ public class HttpReader {
     String[] headers = headerBytes.toString().split("\\r\\n");
 
     var RequestOptions = parseRequestOptions(headers);
-    Logger.info(RequestOptions.toString());
+    ByteArrayOutputStream contentBytes = readContentBytes(in, RequestOptions);
 
-    return new HttpRequest(headerBytes.toString(), headers);
+    return new HttpRequest(headerBytes.toString(), headers, contentBytes.toString());
   }
 
   public ByteArrayOutputStream readHederBytes(BufferedInputStream in) throws IOException {
@@ -42,15 +41,29 @@ public class HttpReader {
     return headerBytes;
   }
 
-  public ByteArrayOutputStream readBodyBytes(BufferedInputStream in) throws IOException {
-    ByteArrayOutputStream headerBytes = new ByteArrayOutputStream();
-    return headerBytes;
+  public ByteArrayOutputStream readContentBytes(BufferedInputStream in, RequestOptions options)
+      throws IOException {
+    ByteArrayOutputStream contentBytes = new ByteArrayOutputStream();
+
+    byte[] buffer = new byte[8192];
+    int n;
+
+    if (!options.chunk() && options.contentLength() > 0) {
+      int remaining = options.contentLength();
+      while (remaining > 0
+          && (n = in.read(buffer, 0, (int) Math.min(buffer.length, remaining))) != -1) {
+        contentBytes.write(buffer, 0, n);
+        remaining -= n;
+      }
+    }
+
+    return contentBytes;
   }
 
   public RequestOptions parseRequestOptions(String[] headers) {
 
     boolean chunk = false;
-    int contentLength = 0;
+    Integer contentLength = null;
     String charset = null;
 
     for (String header : headers) {
