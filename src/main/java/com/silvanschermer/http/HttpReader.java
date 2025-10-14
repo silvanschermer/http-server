@@ -1,5 +1,6 @@
 package com.silvanschermer.http;
 
+import com.silvanschermer.utils.Logger;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,6 +56,8 @@ public class HttpReader {
         contentBytes.write(buffer, 0, n);
         remaining -= n;
       }
+    } else if (options.chunk()) {
+      Logger.info("'Chunked'");
     }
 
     return contentBytes;
