@@ -62,11 +62,22 @@ public class HttpReader {
 
   public RequestOptions parseRequestOptions(String[] headers) {
 
+    String methodToken = null;
+    String identifier = null;
+    String protocolVersion = null;
     boolean chunk = false;
     Integer contentLength = null;
     String charset = null;
 
-    for (String header : headers) {
+    for (int i = 0; i < headers.length; i++) {
+      String header = headers[i];
+      if (i == 0) {
+        String[] firstLineSplit = header.split(" ");
+        methodToken = firstLineSplit[0];
+        identifier = firstLineSplit[1];
+        protocolVersion = firstLineSplit[2];
+      }
+
       String headerLower = header.toLowerCase();
       if (headerLower.startsWith("transfer-encoding:") && headerLower.contains("chunked")) {
         chunk = true;
@@ -81,6 +92,7 @@ public class HttpReader {
       }
     }
 
-    return new RequestOptions(chunk, contentLength, charset);
+    return new RequestOptions(
+        new HttpFirstLine(methodToken, identifier, protocolVersion), chunk, contentLength, charset);
   }
 }
