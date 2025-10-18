@@ -6,20 +6,37 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+/** Reads HTTP requests from a socket. */
 public class HttpReader {
+
+  /** Instantiates a new HttpReader. */
   public HttpReader() {}
 
+  /**
+   * Reads an HTTP request from the given socket and returns it.
+   *
+   * @param socket the client socket connection
+   * @return the parsed {@link HttpRequest}
+   * @throws IOException if an I/O error occurs during reading
+   */
   public HttpRequest fromSocket(Socket socket) throws IOException {
     BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
     ByteArrayOutputStream headerBytes = readHederBytes(in);
     String[] headers = headerBytes.toString().split("\\r\\n");
 
-    var RequestOptions = parseRequestOptions(headers);
-    ByteArrayOutputStream contentBytes = readContentBytes(in, RequestOptions);
+    var requestOptions = parseRequestOptions(headers);
+    ByteArrayOutputStream contentBytes = readContentBytes(in, requestOptions);
 
     return new HttpRequest(headerBytes.toString(), headers, contentBytes.toString());
   }
 
+  /**
+   * Reads the HTTP headers from the input stream.
+   *
+   * @param in the input stream to read from
+   * @return a byte array containing the header bytes
+   * @throws IOException if an I/O error occurs during reading
+   */
   public ByteArrayOutputStream readHederBytes(BufferedInputStream in) throws IOException {
     ByteArrayOutputStream headerBytes = new ByteArrayOutputStream();
 
@@ -42,6 +59,15 @@ public class HttpReader {
     return headerBytes;
   }
 
+  /**
+   * Reads the HTTP content from the input stream based on the request options.
+   *
+   * @param in the input stream to read from
+   * @param options the request options containing content length and chunked transfer encoding
+   *     information
+   * @return a byte array containing the content bytes
+   * @throws IOException if an I/O error occurs during reading
+   */
   public ByteArrayOutputStream readContentBytes(BufferedInputStream in, RequestOptions options)
       throws IOException {
     ByteArrayOutputStream contentBytes = new ByteArrayOutputStream();
@@ -63,6 +89,12 @@ public class HttpReader {
     return contentBytes;
   }
 
+  /**
+   * Parses the request options from the HTTP headers.
+   *
+   * @param headers the array of HTTP headers
+   * @return the parsed {@link RequestOptions}
+   */
   public RequestOptions parseRequestOptions(String[] headers) {
 
     String methodToken = null;
